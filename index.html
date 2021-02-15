@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>Chat app</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
+    </head>
+    <body>
+        <ul id="messages"></ul>
+        <form id="form">
+            <input id="user" type="text" name="user" autocomplete="off">
+            <button>Submit</button>
+        </form>
+        <form id="form1">
+            <input id="m" type="text" name="message" autocomplete="off">
+            <button>Submit</button>
+        </form>
+    </body>
+    <script>
+        $(function () {
+            var socket = io();
+            $('#form').submit(function(e){
+                e.preventDefault(); // prevents page reloading
+                var obj = {
+                    name: $('#user').val(),
+                    room: 3,
+                }
+                socket.emit('add-user', obj);
+                return false;
+            });
+            $('#form1').submit(function(e){
+                e.preventDefault(); // prevents page reloading
+                const items = {
+                    id: '',
+                    comment: $('#m').val(),
+                    post_id: "15",
+                    user_id: 10002,
+                    replied_to: 0,
+                    status: 1,
+                    created_on: new Date(),
+                    updated_on: new Date()
+                };
+                socket.emit('add-message', items);
+                $('#m').val('');
+                return false;
+            });
+            socket.on('message', function(msg){
+                console.log(msg);
+                $('#messages').append($('<li>').text(msg.comment));
+            });
+
+            socket.on('connected', function(msg) {
+                console.log(msg);
+            });
+            socket.on('user-connected', function(msg) {
+                console.log(msg);
+            });
+        });
+    </script>
+</html>
